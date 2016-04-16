@@ -71,7 +71,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="assets\bunny.png" />
+    <Content Include="assets\poop.png" />
+    <Content Include="assets\tile.png" />
     <Content Include="index.html" />
     <Content Include="lib\pixi.min.js" />
     <Content Include="packages.config" />
@@ -114,10 +115,6 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
-  <Target Name="BuildBridgeProject" BeforeTargets="Build">
-    <Message Text="Building Bridge project" />
-    <MSBuild Projects="../ShoopDaPoop.Application/ShoopDaPoop.Application.csproj" Targets="Build" />
-  </Target>
   <Target Name="CopyLinkedContentFiles" BeforeTargets="Build">
     <Copy SourceFiles="%(Content.Identity)" DestinationFiles="%(Content.Link)" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" Condition="'%(Content.Link)' != ''" />
   </Target>

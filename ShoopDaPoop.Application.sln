@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShoopDaPoop.Application", "ShoopDaPoop.Application\ShoopDaPoop.Application.csproj", "{59FE4E54-62B3-46F7-BEAC-9249FDD957D8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShoopDaPoop.Website", "ShoopDaPoop.Website\ShoopDaPoop.Website.csproj", "{FC94F520-760F-441F-98F4-C774D84EAF6A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{59FE4E54-62B3-46F7-BEAC-9249FDD957D8} = {59FE4E54-62B3-46F7-BEAC-9249FDD957D8}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -37,6 +37,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Board.cs" />
+    <Compile Include="BoardSummary.cs" />
+    <Compile Include="Cell.cs" />
+    <Compile Include="CellField.cs" />
+    <Compile Include="IntPoint.cs" />
+    <Compile Include="Item.cs" />
+    <Compile Include="ItemState.cs" />
+    <Compile Include="PointExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
