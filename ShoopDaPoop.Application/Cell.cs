@@ -40,6 +40,10 @@ namespace ShoopDaPoop.Application
 		{
 			Sprite.Position.Set(position);
 			Sprite.Alpha = Temperature;
+			if (Sprite.Alpha == 0)
+			{
+				Sprite.Alpha = 0.1f;
+			}
 		}
 	}
 }

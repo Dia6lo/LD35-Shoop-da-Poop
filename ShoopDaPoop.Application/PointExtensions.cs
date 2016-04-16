@@ -43,5 +43,10 @@ namespace ShoopDaPoop.Application
 				yield return item;
 			}
 		}
+
+		public static IntPoint Add(this IntPoint point, IntPoint value)
+		{
+			return new IntPoint(point.X + value.X, point.Y + value.Y);
+		}
 	}
 }

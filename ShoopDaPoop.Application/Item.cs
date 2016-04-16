@@ -15,56 +15,8 @@ namespace ShoopDaPoop.Application
 			{
 				Anchor = new Point(0.5f, 0.5f)
 			};
-			Sprite["interactive"] = true;
-			Sprite.OnClick(OnClick);
-			MoveSpeed = 4;
+			MoveSpeed = 1;
 		}
-
-		private void OnClick(InteractionEvent arg)
-		{
-			if (State != ItemState.Idle) return;
-			var selectedItem = Board.Items.FirstOrDefault(i => i.Selected);
-			if (selectedItem == null)
-			{
-				Selected = true;
-			}
-			else
-			{
-				var isNearHorizontally = Math.Abs(selectedItem.Position.X - Position.X) == 1 &&
-				                         selectedItem.Position.Y == Position.Y;
-				var isNearVertically = Math.Abs(selectedItem.Position.Y - Position.Y) == 1 &&
-										 selectedItem.Position.X == Position.X;
-				if (isNearVertically ^ isNearHorizontally)
-				{
-					Swap(selectedItem);
-					SwappedWith = selectedItem;
-					selectedItem.SwappedWith = this;
-				}
-				else
-				{
-					selectedItem.Selected = false;
-					selectedItem.Sprite.Rotation = 0;
-					Selected = true;
-				}
-			}
-		}
-
-		public void Swap(Item item)
-		{
-			var currentTarget = Target;
-			Target = item.Target;
-			Target.TargetedBy = this;
-			State = ItemState.Moving;
-			Selected = false;
-			Sprite.Rotation = 0;
-			item.Target = currentTarget;
-			item.Target.TargetedBy = item;
-			item.State = ItemState.Moving;
-			item.Selected = false;
-			item.Sprite.Rotation = 0;
-		}
-
-		public Item SwappedWith { get; set; }
 
 		public bool Selected { get; set; }
 

@@ -9,37 +9,68 @@ namespace ShoopDaPoop.Application
 		public BoardSummary(Item item, Board board)
 		{
 			Items = board.Items.Where(i => i != item).ToList();
-			if (item.Position.Y < board.Height)
+			var neighborCells = GetLegalNeighborCells(item, board);
+			var cellsByPriority = neighborCells
+				.Where(cell => cell.TargetedBy == null && cell.Temperature > 0)
+				.OrderByDescending(cell => cell.Temperature)
+				.ThenByDescending(cell => cell.Position.Y);
+			if (cellsByPriority.Any())
 			{
-				var pointUnderItem = new IntPoint(item.Position.X, item.Position.Y + 1);
-				if (board.IsInBounds(pointUnderItem) && board.CellField[pointUnderItem].TargetedBy == null)
+				if (item.Target == null)
 				{
-					var cell = board.CellField[pointUnderItem];
-					if (cell.TargetedBy == null)
-					{
-						PrefferedTarget = cell;
-					}
+					PrefferedTarget = cellsByPriority.First();
+					return;
 				}
-				else
+				var firstByTemperature = cellsByPriority
+					.FirstOrDefault(cell => cell.Temperature > item.Target.Temperature);
+				if (firstByTemperature != null)
 				{
-					var possibleTargetPositions = new[]
-					{
-						new IntPoint(item.Position.X - 1, item.Position.Y + 1),
-						new IntPoint(item.Position.X + 1, item.Position.Y + 1),
-					}
-						.Where(board.IsInBounds)
-						.Where(pos => board.CellField[pos].TargetedBy == null).ToList();
-					if (possibleTargetPositions.Count > 1)
-					{
-						var index = new Random().Next(possibleTargetPositions.Count);
-						PrefferedTarget = board.CellField[possibleTargetPositions[index]];
-					}
-					else if (possibleTargetPositions.Any())
-					{
-						PrefferedTarget = board.CellField[possibleTargetPositions.First()];
-					}
+					PrefferedTarget = firstByTemperature;
 				}
+				/*var firstByGravity = cellsByPriority
+					.FirstOrDefault(cell => cell.Position.Y > item.Target.Position.Y &&
+					                        cell.Temperature >= item.Target.Temperature);
+				if (firstByGravity != null)
+				{
+					PrefferedTarget = firstByGravity;
+				}*/
 			}
+		}
+
+		private List<IntPoint> GetLegalNeighborPositions(Item item, Board board)
+		{
+			var offsets = new[] { 0, -1, 1 };
+			return offsets
+				.SelectMany(x => offsets.Select(y => new IntPoint(x, y)))
+				.Where(pos => pos.X != 0 || pos.Y != 0)
+				.Select(pos => item.Position.Add(pos))
+				.Where(board.IsInBounds)
+				.ToList();
+		}
+
+		private List<IntPoint> GetLegalNeighborPositions(Cell cell, Board board)
+		{
+			var offsets = new[] { 0, -1, 1 };
+			return offsets
+				.SelectMany(x => offsets.Select(y => new IntPoint(x, y)))
+				.Where(pos => pos.X != 0 || pos.Y != 0)
+				.Select(pos => cell.Position.Add(pos))
+				.Where(board.IsInBounds)
+				.ToList();
+		}
+
+		private List<Cell> GetLegalNeighborCells(Cell cell, Board board)
+		{
+			return GetLegalNeighborPositions(cell, board)
+				.Select(pos => board.CellField[pos])
+				.ToList();
+		}
+
+		private List<Cell> GetLegalNeighborCells(Item item, Board board)
+		{
+			return GetLegalNeighborPositions(item, board)
+				.Select(pos => board.CellField[pos])
+				.ToList();
 		}
 
 		public Cell PrefferedTarget { get; private set; }

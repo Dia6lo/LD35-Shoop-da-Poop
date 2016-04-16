@@ -5,7 +5,6 @@ namespace ShoopDaPoop.Application
 {
 	public class CellField
 	{
-		private Cell[,] cells;
 		private Texture cellTexture;
 
 		public CellField(int width, int height)
@@ -14,7 +13,7 @@ namespace ShoopDaPoop.Application
 			Height = height;
 			Container = new Container();
 			cellTexture = Texture.FromImage("assets/Tile.png");
-			cells = new Cell[width, height];
+			Cells = new Cell[width, height];
 			ForEachPosition(point => this[point] = new Cell(cellTexture) {Position = point});
 			ForEachCell((point, cell) =>
 			{
@@ -22,6 +21,8 @@ namespace ShoopDaPoop.Application
 				Container.AddChild(cell.Sprite);
 			});
 		}
+
+		public Cell[,] Cells { get; private set; }
 
 		public void SetTemperature(float temperature, params IntPoint[] coordinates)
 		{
@@ -33,14 +34,14 @@ namespace ShoopDaPoop.Application
 
 		public Cell this[IntPoint point]
 		{
-			get { return cells[point.X, point.Y]; }
-			set { cells[point.X, point.Y] = value; }
+			get { return Cells[point.X, point.Y]; }
+			set { Cells[point.X, point.Y] = value; }
 		}
 
 		public Cell this[int x, int y]
 		{
-			get { return cells[x, y]; }
-			set { cells[x, y] = value; }
+			get { return Cells[x, y]; }
+			set { Cells[x, y] = value; }
 		}
 
 		public void Update()
@@ -61,7 +62,7 @@ namespace ShoopDaPoop.Application
 
 		public void ForEachCell(Action<IntPoint, Cell> action)
 		{
-			ForEachPosition(point => action(point, cells[point.X, point.Y]));
+			ForEachPosition(point => action(point, Cells[point.X, point.Y]));
 		}
 
 		public void ForEachPosition(Action<IntPoint> action)
@@ -78,8 +79,8 @@ namespace ShoopDaPoop.Application
 		public void Expand()
 		{
 			var newCells = new Cell[Width+1, Height];
-			ForEachPosition(point => newCells[point.X, point.Y] = cells[point.X, point.Y]);
-			cells = newCells;
+			ForEachPosition(point => newCells[point.X, point.Y] = Cells[point.X, point.Y]);
+			Cells = newCells;
 			Width ++;
 			ForEachPosition(point =>
 			{

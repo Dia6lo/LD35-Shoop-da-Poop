@@ -8,7 +8,7 @@ namespace ShoopDaPoop.Application
 {
 	public class Board
 	{
-		private int updatesSinceCreation;
+		public int UpdatesSinceCreation;
 		private List<Func<Item>> itemFactories = new List<Func<Item>>
 		{
 			() => new Square(),
@@ -26,12 +26,51 @@ namespace ShoopDaPoop.Application
 			};
 			CellField = new CellField(width, height);
 			Container.AddChild(CellField.Container);
+			SpawningColumns = new List<int>();
 		}
 
 		public CellField CellField { get; private set; }
 
-		public void AddItem(int x)
+		public void FillWithItems(List<Item> items)
 		{
+			var firstType = items.First().Type;
+			while (items.Take(4).All(item => item.Type == firstType))
+			{
+				items = Bridge.Linq.Enumerable.Shuffle(items).ToList();
+				firstType = items.First().Type;
+			}
+			var cells = new List<Cell>();
+			CellField.ForEachCell((point, cell) => cells.Add(cell));
+			var cellGroups = cells
+				.GroupBy(cell => cell.Temperature)
+				.OrderByDescending(group => group.Key);
+			var currentIndex = 0;
+			foreach (var cellGroup in cellGroups)
+			{
+				foreach (var cell in cellGroup.Shuffle())
+				{
+					var item = items[currentIndex++];
+					item.Position = cell.Position;
+					item.State = ItemState.Idle;
+					item.Sprite.Position = cell.Sprite.Position;
+					item.Board = this;
+					item.Target = cell;
+					cell.TargetedBy = item;
+					Items.Add(item);
+					Container.AddChild(item.Sprite);
+					item.OnDeath = () =>
+					{
+						Items.Remove(item);
+						Container.RemoveChild(item.Sprite);
+					};
+					if (currentIndex == items.Count) return;
+				}
+			}
+		}
+
+		public void AddItem()
+		{
+			var x = GetSpawningColumn();
 			var position = new IntPoint(x, -1);
 			var cell = CellField[new IntPoint(x, 0)];
 			var randomIndex = new Random().Next(itemFactories.Count);
@@ -49,28 +88,32 @@ namespace ShoopDaPoop.Application
 			};
 		}
 
+		private int GetSpawningColumn()
+		{
+			if (SpawningColumns == null || !SpawningColumns.Any())
+			{
+				return Width/2;
+			}
+			var allowedColumns = SpawningColumns
+				.Where(column => Items.All(item => item.State != ItemState.Spawned || item.Position.X != column))
+				.ToList();
+			var randomIndex = new Random().Next(SpawningColumns.Count);
+			return SpawningColumns[randomIndex];
+		}
+
+		private bool IsSpawningAllowed
+		{
+			get { return Items.Count < 20 && Items.Count(item => item.State == ItemState.Spawned) <= 2; }
+		}
+
 		public void Update()
 		{
-			updatesSinceCreation++;
-			if (SpawningCell.TargetedBy == null && updatesSinceCreation > 3)
+			UpdatesSinceCreation++;
+			/*if (IsSpawningAllowed && updatesSinceCreation > 3)
 			{
-				AddItem(SpawningX);
-			}
+				AddItem();
+			}*/
 			HandleMatches();
-			var awaitingBackSwap = Items.Where(i => i.State == ItemState.Idle && i.SwappedWith != null);
-			foreach (var item in awaitingBackSwap)
-			{
-				if (item.SwappedWith == null) continue; // We already initiated back swap with this.
-				if (item.SwappedWith.State == ItemState.Dying)
-				{
-					item.SwappedWith.SwappedWith = null;
-					item.SwappedWith = null;
-					continue;
-				}
-				item.Swap(item.SwappedWith);
-				item.SwappedWith.SwappedWith = null;
-				item.SwappedWith = null;
-			}
 			foreach (var item in Items)
 			{
 				item.Update();
@@ -79,11 +122,28 @@ namespace ShoopDaPoop.Application
 
 		private void HandleMatches()
 		{
-			var matches = FindMatches();
-			foreach (var item in matches)
+			var belly = new[]
+			{
+				new IntPoint(4, 4),
+				new IntPoint(5, 4),
+				new IntPoint(4, 5),
+				new IntPoint(5, 5)
+			};
+			var items = belly
+				.Select(pos => CellField[pos].TargetedBy)
+				.ToList();
+			if(items.Any(item => item == null || item.State != ItemState.Idle)) return;
+			var firstType = items.First().Type;
+			if (items.Any(item => item.Type != firstType)) return;
+			foreach (var item in items)
 			{
 				item.Die();
 			}
+			/*var matches = FindMatches();
+			foreach (var item in matches)
+			{
+				item.Die();
+			}*/
 		}
 
 		public List<Item> GetColumnMatches(int columnIndex)
@@ -147,6 +207,8 @@ namespace ShoopDaPoop.Application
 		{
 			CellField.Expand();
 		}
+
+		public List<int> SpawningColumns { get; set; }
 
 		private int SpawningX
 		{
