@@ -4,6 +4,8 @@ namespace ShoopDaPoop.Application
 	{
 		Spawned,
 		Moving,
-		Idle
+		Idle,
+		Dying,
+		Died
 	}
 }

@@ -41,11 +41,16 @@
     <Compile Include="BoardSummary.cs" />
     <Compile Include="Cell.cs" />
     <Compile Include="CellField.cs" />
+    <Compile Include="Circle.cs" />
+    <Compile Include="Diamond.cs" />
     <Compile Include="IntPoint.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="ItemState.cs" />
+    <Compile Include="ItemType.cs" />
     <Compile Include="PointExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Snake.cs" />
+    <Compile Include="Square.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Bridge, Version=1.12.0.0, Culture=neutral, processorArchitecture=MSIL">

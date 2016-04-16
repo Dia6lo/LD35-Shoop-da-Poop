@@ -71,7 +71,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="assets\Circle.png" />
+    <Content Include="assets\Diamond.png" />
     <Content Include="assets\poop.png" />
+    <Content Include="assets\Snake.png" />
+    <Content Include="assets\Square.png" />
     <Content Include="assets\tile.png" />
     <Content Include="index.html" />
     <Content Include="lib\pixi.min.js" />

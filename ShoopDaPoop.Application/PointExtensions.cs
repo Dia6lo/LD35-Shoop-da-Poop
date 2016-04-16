@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Bridge.Pixi;
 
 namespace ShoopDaPoop.Application
@@ -30,6 +31,17 @@ namespace ShoopDaPoop.Application
 			var val = 1.0f/(float) Math.Sqrt(point.X* point.X + point.Y * point.Y);
 			point.X *= val;
 			point.Y *= val;
+		}
+
+		public static IEnumerable<T> MyDistinct<T>(this IEnumerable<T> enumerable)
+		{
+			var yielded = new List<T>();
+			foreach (var item in enumerable)
+			{
+				if (yielded.Contains(item)) continue;
+				yielded.Add(item);
+				yield return item;
+			}
 		}
 	}
 }

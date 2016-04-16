@@ -13,7 +13,7 @@ namespace ShoopDaPoop.Application
 			Width = width;
 			Height = height;
 			Container = new Container();
-			cellTexture = Texture.FromImage("assets/tile.png");
+			cellTexture = Texture.FromImage("assets/Tile.png");
 			cells = new Cell[width, height];
 			ForEachPosition(point => this[point] = new Cell(cellTexture) {Position = point});
 			ForEachCell((point, cell) =>
@@ -27,6 +27,12 @@ namespace ShoopDaPoop.Application
 		{
 			get { return cells[point.X, point.Y]; }
 			set { cells[point.X, point.Y] = value; }
+		}
+
+		public Cell this[int x, int y]
+		{
+			get { return cells[x, y]; }
+			set { cells[x, y] = value; }
 		}
 
 		public void Update()

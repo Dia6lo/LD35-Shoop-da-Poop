@@ -11,11 +11,15 @@ namespace ShoopDaPoop.Application
 		[Ready]
 		public static void Main()
 		{
-			renderer = Pixi.AutoDetectRenderer(800, 600, new RendererOptions {BackgroundColor = 0x1099bb});
+			renderer = Pixi.AutoDetectRenderer(800, 600, new RendererOptions
+			{
+				BackgroundColor = 0x1099bb,
+				RoundPixels = true
+			});
 			Document.Body.AppendChild(renderer.View);
 			var stage = new Container();
-			board = new Board(5, 5);
-			board.Container.Position.Set(100, 100);
+			board = new Board(5, 15);
+			board.Container.Position.Set(10, 10);
 			stage.AddChild(board.Container);
 			Animate();
 		}

@@ -3,11 +3,16 @@ using Bridge.Pixi;
 
 namespace ShoopDaPoop.Application
 {
-	public class Item
+	public abstract class Item
 	{
+		public Action OnDeath;
+
 		public Item(Texture texture = null)
 		{
-			Sprite = new Sprite(texture);
+			Sprite = new Sprite(texture)
+			{
+				Pivot = new Point(0.5f, 0.5f)
+			};
 			MoveSpeed = 4;
 		}
 
@@ -16,6 +21,8 @@ namespace ShoopDaPoop.Application
 		public ItemState State { get; set; }
 
 		public Sprite Sprite { get; private set; }
+
+		public abstract ItemType Type { get; }
 
 		public void Update(Board board)
 		{
@@ -30,9 +37,24 @@ namespace ShoopDaPoop.Application
 				case ItemState.Idle:
 					HandleIdleState(summary);
 					break;
+				case ItemState.Dying:
+					HandleDying();
+					break;
 				default:
 					throw new ArgumentOutOfRangeException();
 			}
+		}
+
+		private void HandleDying()
+		{
+			if (Sprite.Scale.X < 0.1f)
+			{
+				Sprite.Destroy();
+				State = ItemState.Died;
+				OnDeath();
+				return;
+			}
+			Sprite.Scale = Sprite.Scale.Subtract(new Point(0.1f, 0.1f));
 		}
 
 		private void HandleIdleState(BoardSummary summary)
@@ -83,5 +105,12 @@ namespace ShoopDaPoop.Application
 		}
 
 		public float MoveSpeed { get; set; }
+
+		public void Die()
+		{
+			State = ItemState.Dying;
+			Target.TargetedBy = null;
+			Target = null;
+		}
 	}
 }
