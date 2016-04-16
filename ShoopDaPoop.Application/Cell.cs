@@ -6,8 +6,13 @@ namespace ShoopDaPoop.Application
 	{
 		public Cell(Texture texture = null)
 		{
-			Sprite = new Sprite(texture);
+			Sprite = new Sprite(texture)
+			{
+				Anchor = new Point(0.5f, 0.5f)
+			};
 		}
+
+		public float Temperature { get; set; }
 
 		public IntPoint Position { get; set; }
 
@@ -34,6 +39,7 @@ namespace ShoopDaPoop.Application
 		public void PreRender(Point position)
 		{
 			Sprite.Position.Set(position);
+			Sprite.Alpha = Temperature;
 		}
 	}
 }

@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using Bridge.Pixi;
+using Bridge.Pixi.Interaction;
 
 namespace ShoopDaPoop.Application
 {
@@ -11,10 +13,62 @@ namespace ShoopDaPoop.Application
 		{
 			Sprite = new Sprite(texture)
 			{
-				Pivot = new Point(0.5f, 0.5f)
+				Anchor = new Point(0.5f, 0.5f)
 			};
+			Sprite["interactive"] = true;
+			Sprite.OnClick(OnClick);
 			MoveSpeed = 4;
 		}
+
+		private void OnClick(InteractionEvent arg)
+		{
+			if (State != ItemState.Idle) return;
+			var selectedItem = Board.Items.FirstOrDefault(i => i.Selected);
+			if (selectedItem == null)
+			{
+				Selected = true;
+			}
+			else
+			{
+				var isNearHorizontally = Math.Abs(selectedItem.Position.X - Position.X) == 1 &&
+				                         selectedItem.Position.Y == Position.Y;
+				var isNearVertically = Math.Abs(selectedItem.Position.Y - Position.Y) == 1 &&
+										 selectedItem.Position.X == Position.X;
+				if (isNearVertically ^ isNearHorizontally)
+				{
+					Swap(selectedItem);
+					SwappedWith = selectedItem;
+					selectedItem.SwappedWith = this;
+				}
+				else
+				{
+					selectedItem.Selected = false;
+					selectedItem.Sprite.Rotation = 0;
+					Selected = true;
+				}
+			}
+		}
+
+		public void Swap(Item item)
+		{
+			var currentTarget = Target;
+			Target = item.Target;
+			Target.TargetedBy = this;
+			State = ItemState.Moving;
+			Selected = false;
+			Sprite.Rotation = 0;
+			item.Target = currentTarget;
+			item.Target.TargetedBy = item;
+			item.State = ItemState.Moving;
+			item.Selected = false;
+			item.Sprite.Rotation = 0;
+		}
+
+		public Item SwappedWith { get; set; }
+
+		public bool Selected { get; set; }
+
+		public Board Board { get; set; }
 
 		public IntPoint Position { get; set; }
 
@@ -24,9 +78,9 @@ namespace ShoopDaPoop.Application
 
 		public abstract ItemType Type { get; }
 
-		public void Update(Board board)
+		public void Update()
 		{
-			var summary = new BoardSummary(this, board);
+			var summary = new BoardSummary(this, Board);
 			switch (State)
 			{
 				case ItemState.Spawned:
@@ -59,6 +113,10 @@ namespace ShoopDaPoop.Application
 
 		private void HandleIdleState(BoardSummary summary)
 		{
+			if (Selected)
+			{
+				Sprite.Rotation += 0.1f;
+			}
 			if (summary.PrefferedTarget != null)
 			{
 				AssignTarget(summary.PrefferedTarget);
@@ -73,7 +131,7 @@ namespace ShoopDaPoop.Application
 			}
 		}
 
-		private void AssignTarget(Cell target)
+		public void AssignTarget(Cell target)
 		{
 			if (Target != null)
 			{
@@ -82,6 +140,8 @@ namespace ShoopDaPoop.Application
 			Target = target;
 			Target.TargetedBy = this;
 			State = ItemState.Moving;
+			Selected = false;
+			Sprite.Rotation = 0;
 		}
 
 		public Cell Target { get; set; }

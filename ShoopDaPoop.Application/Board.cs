@@ -20,19 +20,15 @@ namespace ShoopDaPoop.Application
 		public Board(int width, int height)
 		{
 			Items = new List<Item>();
-			Container = new Container();
+			Container = new Container()
+			{
+				Position = new Point(32, 32)
+			};
 			CellField = new CellField(width, height);
 			Container.AddChild(CellField.Container);
-			Container["interactive"] = true;
-			Container.OnMouseDown(OnClick);
 		}
 
 		public CellField CellField { get; private set; }
-
-		private void OnClick(InteractionEvent e)
-		{
-			Expand();
-		}
 
 		public void AddItem(int x)
 		{
@@ -43,6 +39,7 @@ namespace ShoopDaPoop.Application
 			item.Position = position;
 			item.State = ItemState.Spawned;
 			item.Sprite.Position = new Point(cell.WorldPosition.X, cell.WorldPosition.Y - cell.Sprite.Height);
+			item.Board = this;
 			Items.Add(item);
 			Container.AddChild(item.Sprite);
 			item.OnDeath = () =>
@@ -60,9 +57,23 @@ namespace ShoopDaPoop.Application
 				AddItem(SpawningX);
 			}
 			HandleMatches();
+			var awaitingBackSwap = Items.Where(i => i.State == ItemState.Idle && i.SwappedWith != null);
+			foreach (var item in awaitingBackSwap)
+			{
+				if (item.SwappedWith == null) continue; // We already initiated back swap with this.
+				if (item.SwappedWith.State == ItemState.Dying)
+				{
+					item.SwappedWith.SwappedWith = null;
+					item.SwappedWith = null;
+					continue;
+				}
+				item.Swap(item.SwappedWith);
+				item.SwappedWith.SwappedWith = null;
+				item.SwappedWith = null;
+			}
 			foreach (var item in Items)
 			{
-				item.Update(this);
+				item.Update();
 			}
 		}
 
@@ -88,7 +99,6 @@ namespace ShoopDaPoop.Application
 			return Enumerable.Range(0, Height)
 				.Select(y => CellField[columnIndex, y])
 				.Select(cell => cell.TargetedBy)
-				.Where(item => item != null && item.State == ItemState.Idle)
 				.ToList();
 		}
 
@@ -98,7 +108,7 @@ namespace ShoopDaPoop.Application
 			for (var i = 1; i < line.Count - 1; i++)
 			{
 				var toCompare = line.GetRange(i - 1, 3);
-				if (toCompare.Any(item => item == null)) continue;
+				if (toCompare.Any(item => item == null || item.State != ItemState.Idle)) continue;
 				var current = i;
 				if (toCompare.Any(item => item.Type != line[current].Type)) continue;
 				result.AddRange(toCompare);
@@ -119,7 +129,6 @@ namespace ShoopDaPoop.Application
 			return Enumerable.Range(0, Width)
 				.Select(x => CellField[x, rowIndex])
 				.Select(cell => cell.TargetedBy)
-				.Where(item => item != null && item.State == ItemState.Idle)
 				.ToList();
 		}
 
@@ -134,7 +143,7 @@ namespace ShoopDaPoop.Application
 			return columnMatches.Concat(rowMatches).MyDistinct().ToList();
 		}
 
-		private void Expand()
+		public void Expand()
 		{
 			CellField.Expand();
 		}

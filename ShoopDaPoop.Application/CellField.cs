@@ -23,6 +23,14 @@ namespace ShoopDaPoop.Application
 			});
 		}
 
+		public void SetTemperature(float temperature, params IntPoint[] coordinates)
+		{
+			foreach (var coordinate in coordinates)
+			{
+				this[coordinate].Temperature = temperature;
+			}
+		}
+
 		public Cell this[IntPoint point]
 		{
 			get { return cells[point.X, point.Y]; }
