@@ -48,5 +48,10 @@ namespace ShoopDaPoop.Application
 		{
 			return new IntPoint(point.X + value.X, point.Y + value.Y);
 		}
+
+		public static float Length(this Point point)
+		{
+			return (float)Math.Sqrt(point.X*point.X + point.Y*point.Y);
+		}
 	}
 }

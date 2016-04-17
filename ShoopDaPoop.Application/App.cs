@@ -8,11 +8,9 @@ namespace ShoopDaPoop.Application
 {
 	public class App
 	{
-		public const float BellyTemperature = 1;
-		public const float BodyTemperature = 0.5f;
-
 		private static IRenderer renderer;
 		private static Board board;
+		private static Container stage;
 
 		[Ready]
 		public static void Main()
@@ -23,8 +21,9 @@ namespace ShoopDaPoop.Application
 				RoundPixels = true
 			});
 			Document.Body.AppendChild(renderer.View);
-			var stage = new Container();
+			stage = new Container();
 			board = new Board(10, 10);
+			board.Container.Position = new Point(200, 200);
 			var temperatureDictionary = new Dictionary<float, IntPoint[]>
 			{
 				{0.2f, new []
@@ -83,22 +82,14 @@ namespace ShoopDaPoop.Application
 				new IntPoint(4, 5),
 				new IntPoint(5, 5)
 			};
-			board.CellField.SetTemperature(BellyTemperature, belly);
-			board.SpawningColumns.AddRange(new []{ 4, 5});
+			board.CellField.SetTemperature(1, belly);
+			var test = new Graphics();
+			test.LineStyle(2, 0xFFFFFF, 0.8f);
+			test.MoveTo(0, 400);
+			test.LineTo(600, 400);
+			stage.AddChild(test);
 			stage.AddChild(board.Container);
-			var expandButton = new Sprite(Texture.FromImage("assets/Poop.png"))
-			{
-				Position = new Point(10, 100)
-			};
-			expandButton["interactive"] = true;
-			expandButton.OnClick(OnClick);
-			stage.AddChild(expandButton);
 			Animate();
-		}
-
-		private static void OnClick(InteractionEvent arg)
-		{
-			board.Expand();
 		}
 
 		private static bool spawnedItems;
@@ -115,8 +106,8 @@ namespace ShoopDaPoop.Application
 				board.FillWithItems(items);
 				spawnedItems = true;
 			}
-			board.PreRender();
-			renderer.Render(board.Container);
+			board.PreRender(new Point(200, 400), new Point(600, 400));
+			renderer.Render(stage);
 		}
 
 		private static Item GetItem(int index)

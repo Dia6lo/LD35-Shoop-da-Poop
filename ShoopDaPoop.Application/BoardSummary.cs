@@ -27,13 +27,6 @@ namespace ShoopDaPoop.Application
 				{
 					PrefferedTarget = firstByTemperature;
 				}
-				/*var firstByGravity = cellsByPriority
-					.FirstOrDefault(cell => cell.Position.Y > item.Target.Position.Y &&
-					                        cell.Temperature >= item.Target.Temperature);
-				if (firstByGravity != null)
-				{
-					PrefferedTarget = firstByGravity;
-				}*/
 			}
 		}
 

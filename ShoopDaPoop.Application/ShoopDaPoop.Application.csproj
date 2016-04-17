@@ -39,6 +39,8 @@
     <Compile Include="App.cs" />
     <Compile Include="Board.cs" />
     <Compile Include="BoardSummary.cs" />
+    <Compile Include="Body.cs" />
+    <Compile Include="BodyPoints.cs" />
     <Compile Include="Cell.cs" />
     <Compile Include="CellField.cs" />
     <Compile Include="Circle.cs" />
@@ -49,6 +51,8 @@
     <Compile Include="ItemType.cs" />
     <Compile Include="PointExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ShiftType.cs" />
+    <Compile Include="Side.cs" />
     <Compile Include="Snake.cs" />
     <Compile Include="Square.cs" />
   </ItemGroup>

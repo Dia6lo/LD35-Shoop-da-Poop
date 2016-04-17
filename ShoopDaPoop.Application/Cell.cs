@@ -39,11 +39,11 @@ namespace ShoopDaPoop.Application
 		public void PreRender(Point position)
 		{
 			Sprite.Position.Set(position);
-			Sprite.Alpha = Temperature;
-			if (Sprite.Alpha == 0)
+			Sprite.Alpha = 0;
+			/*if (Sprite.Alpha == 0)
 			{
 				Sprite.Alpha = 0.1f;
-			}
+			}*/
 		}
 	}
 }

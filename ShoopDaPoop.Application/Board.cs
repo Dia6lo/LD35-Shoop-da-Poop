@@ -2,31 +2,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using Bridge.Pixi;
-using Bridge.Pixi.Interaction;
 
 namespace ShoopDaPoop.Application
 {
 	public class Board
 	{
 		public int UpdatesSinceCreation;
-		private List<Func<Item>> itemFactories = new List<Func<Item>>
-		{
-			() => new Square(),
-			() => new Circle(),
-			() => new Diamond(),
-			() => new Snake()
-		};
+		private Body body;
 
 		public Board(int width, int height)
 		{
 			Items = new List<Item>();
-			Container = new Container()
-			{
-				Position = new Point(32, 32)
-			};
+			Container = new Container();
 			CellField = new CellField(width, height);
+			body = new Body
+			{
+				LeftArmAction = () => Push(Side.Left),
+				RightArmAction = () => Push(Side.Right),
+				LeftLegAction = () => Push(Side.Down),
+				RightLegAction = () => Push(Side.Down),
+				HeadAction = () => Push(Side.Top)
+			};
 			Container.AddChild(CellField.Container);
-			SpawningColumns = new List<int>();
+			Container.AddChild(body.Container);
 		}
 
 		public CellField CellField { get; private set; }
@@ -68,51 +66,9 @@ namespace ShoopDaPoop.Application
 			}
 		}
 
-		public void AddItem()
-		{
-			var x = GetSpawningColumn();
-			var position = new IntPoint(x, -1);
-			var cell = CellField[new IntPoint(x, 0)];
-			var randomIndex = new Random().Next(itemFactories.Count);
-			var item = itemFactories[randomIndex]();
-			item.Position = position;
-			item.State = ItemState.Spawned;
-			item.Sprite.Position = new Point(cell.WorldPosition.X, cell.WorldPosition.Y - cell.Sprite.Height);
-			item.Board = this;
-			Items.Add(item);
-			Container.AddChild(item.Sprite);
-			item.OnDeath = () =>
-			{
-				Items.Remove(item);
-				Container.RemoveChild(item.Sprite);
-			};
-		}
-
-		private int GetSpawningColumn()
-		{
-			if (SpawningColumns == null || !SpawningColumns.Any())
-			{
-				return Width/2;
-			}
-			var allowedColumns = SpawningColumns
-				.Where(column => Items.All(item => item.State != ItemState.Spawned || item.Position.X != column))
-				.ToList();
-			var randomIndex = new Random().Next(SpawningColumns.Count);
-			return SpawningColumns[randomIndex];
-		}
-
-		private bool IsSpawningAllowed
-		{
-			get { return Items.Count < 20 && Items.Count(item => item.State == ItemState.Spawned) <= 2; }
-		}
-
 		public void Update()
 		{
 			UpdatesSinceCreation++;
-			/*if (IsSpawningAllowed && updatesSinceCreation > 3)
-			{
-				AddItem();
-			}*/
 			HandleMatches();
 			foreach (var item in Items)
 			{
@@ -139,89 +95,38 @@ namespace ShoopDaPoop.Application
 			{
 				item.Die();
 			}
-			/*var matches = FindMatches();
-			foreach (var item in matches)
+		}
+
+		public void Push(Side side)
+		{
+			CellField.Push(side);
+		}
+
+		public void PreRender(Point leftFootPosition, Point maxRightPosition)
+		{
+			if (Items.Any() && UpdatesSinceCreation > 3)
 			{
-				item.Die();
-			}*/
-		}
-
-		public List<Item> GetColumnMatches(int columnIndex)
-		{
-			var column = GetColumn(columnIndex);
-			return GetLineMatches(column);
-		}
-
-		public List<Item> GetColumn(int columnIndex)
-		{
-			if (columnIndex < 0 || columnIndex >= Width)
-				return null;
-			return Enumerable.Range(0, Height)
-				.Select(y => CellField[columnIndex, y])
-				.Select(cell => cell.TargetedBy)
-				.ToList();
-		}
-
-		public List<Item> GetLineMatches(List<Item> line)
-		{
-			var result = new List<Item>();
-			for (var i = 1; i < line.Count - 1; i++)
-			{
-				var toCompare = line.GetRange(i - 1, 3);
-				if (toCompare.Any(item => item == null || item.State != ItemState.Idle)) continue;
-				var current = i;
-				if (toCompare.Any(item => item.Type != line[current].Type)) continue;
-				result.AddRange(toCompare);
+				DrawBody();
+				var leftFootWorld = Container.Position.Add(body.LeftFoot);
+				var rightFootWorld = Container.Position.Add(body.RightFoot);
+				var currentVector = rightFootWorld.Subtract(leftFootWorld);
+				var targetVector = maxRightPosition.Subtract(leftFootPosition);
+				var currentLength = currentVector.Length();
+				var targetLength = targetVector.Length();
+				var dotProduct = currentVector.X*targetVector.X + currentVector.Y*targetVector.Y;
+				var cos = dotProduct/(currentLength*targetLength);
+				var angle = (float)Math.Acos(cos);
+				if (currentVector.Y > 0)
+					angle *= -1;
+				Container.Rotation = angle;
+				var sin = (float)Math.Sin(angle);
+				var actualLeftFootLocal = new Point
+				{
+					X = cos*body.LeftFoot.X - sin*body.LeftFoot.Y,
+					Y = cos*body.LeftFoot.Y + sin*body.LeftFoot.X
+				};
+				Container.Position = Container.Position.Add(leftFootPosition.Subtract(Container.Position.Add(actualLeftFootLocal)));
 			}
-			return result.MyDistinct().ToList();
-		}
-
-		public List<Item> GetRowMatches(int rowIndex)
-		{
-			var row = GetRow(rowIndex);
-			return GetLineMatches(row);
-		}
-
-		public List<Item> GetRow(int rowIndex)
-		{
-			if (rowIndex < 0 || rowIndex >= Height)
-				return null;
-			return Enumerable.Range(0, Width)
-				.Select(x => CellField[x, rowIndex])
-				.Select(cell => cell.TargetedBy)
-				.ToList();
-		}
-
-		public List<Item> FindMatches()
-		{
-			var columnMatches = Enumerable.Range(0, Width)
-				.SelectMany(GetColumnMatches)
-				.ToList();
-			var rowMatches = Enumerable.Range(0, Height)
-				.SelectMany(GetRowMatches)
-				.ToList();
-			return columnMatches.Concat(rowMatches).MyDistinct().ToList();
-		}
-
-		public void Expand()
-		{
-			CellField.Expand();
-		}
-
-		public List<int> SpawningColumns { get; set; }
-
-		private int SpawningX
-		{
-			get { return Width/2; }
-		}
-
-		private Cell SpawningCell
-		{
-			get { return CellField[new IntPoint(SpawningX, 0)]; }
-		}
-
-		public void PreRender()
-		{
 			CellField.PreRender(new Point());
 			foreach (var item in Items)
 			{
@@ -229,19 +134,29 @@ namespace ShoopDaPoop.Application
 			}
 		}
 
+		private void DrawBody()
+		{
+			var positions = Items.Select(item => new { item.Sprite.Position, Bounds = item.Sprite.GetBounds()});
+			var orderedX = positions.OrderBy(pos => pos.Position.X);
+			var orderedY = positions.OrderBy(pos => pos.Position.Y);
+			var firstX = orderedX.First();
+			var firstY = orderedY.First();
+			var lastX = orderedX.Last();
+			var lastY = orderedY.Last();
+			var allMinX = positions.Where(pos => pos.Position.X == firstX.Position.X);
+			var allMinY = positions.Where(pos => pos.Position.Y == firstY.Position.Y);
+			var allMaxX = positions.Where(pos => pos.Position.X == lastX.Position.X);
+			var allMaxY = positions.Where(pos => pos.Position.Y == lastY.Position.Y);
+			var minX = new Point(firstX.Position.X - firstX.Bounds.Width, allMinX.Average(pos => pos.Position.Y));
+			var minY = new Point(allMinY.Average(pos => pos.Position.X), firstY.Position.Y - firstY.Bounds.Height);
+			var maxX = new Point(lastX.Position.X + lastX.Bounds.Width, allMaxX.Average(pos => pos.Position.Y));
+			var maxY = new Point(allMaxY.Average(pos => pos.Position.X), lastY.Position.Y + lastY.Bounds.Height);
+			body.Render(new BodyPoints {MinX = minX, MinY = minY, MaxX = maxX, MaxY = maxY});
+		}
+
 		public Container Container { get; private set; }
 
 		public List<Item> Items { get; set; }
-
-		public int Width
-		{
-			get { return CellField.Width; }
-		}
-
-		public int Height
-		{
-			get { return CellField.Height; }
-		}
 
 		public bool IsInBounds(IntPoint position)
 		{
