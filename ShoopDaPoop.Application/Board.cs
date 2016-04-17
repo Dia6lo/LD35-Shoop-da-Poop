@@ -9,6 +9,8 @@ namespace ShoopDaPoop.Application
 	{
 		public int UpdatesSinceCreation;
 		private Body body;
+		private int updatesSinceCellMovement = RequiredUpdatesSinceMovement;
+		private const int RequiredUpdatesSinceMovement = 60;
 
 		public Board(int width, int height)
 		{
@@ -17,11 +19,29 @@ namespace ShoopDaPoop.Application
 			CellField = new CellField(width, height);
 			body = new Body
 			{
-				LeftArmAction = () => Push(Side.Left),
-				RightArmAction = () => Push(Side.Right),
-				LeftLegAction = () => Push(Side.Down),
-				RightLegAction = () => Push(Side.Down),
-				HeadAction = () => Push(Side.Top)
+				DragActions = new Dictionary<Limb, DragActions>
+				{
+					{Limb.Head, new DragActions
+					{
+						Pull = () => Pull(Side.Top),
+						Push = () => Push(Side.Top)
+					} },
+					{Limb.LeftArm, new DragActions
+					{
+						Pull = () => Pull(Side.Left),
+						Push = () => Push(Side.Left)
+					} },
+					{Limb.RightArm, new DragActions
+					{
+						Pull = () => Pull(Side.Right),
+						Push = () => Push(Side.Right)
+					} },
+					{Limb.Pinus, new DragActions
+					{
+						Pull = () => Pull(Side.Bottom),
+						Push = () => Push(Side.Bottom)
+					} }
+				}
 			};
 			Container.AddChild(CellField.Container);
 			Container.AddChild(body.Container);
@@ -69,6 +89,7 @@ namespace ShoopDaPoop.Application
 		public void Update()
 		{
 			UpdatesSinceCreation++;
+			updatesSinceCellMovement++;
 			HandleMatches();
 			foreach (var item in Items)
 			{
@@ -97,9 +118,18 @@ namespace ShoopDaPoop.Application
 			}
 		}
 
+		public void Pull(Side side)
+		{
+			if (updatesSinceCellMovement < RequiredUpdatesSinceMovement) return;
+			CellField.Pull(side);
+			updatesSinceCellMovement = 0;
+		}
+
 		public void Push(Side side)
 		{
+			if (updatesSinceCellMovement < RequiredUpdatesSinceMovement) return;
 			CellField.Push(side);
+			updatesSinceCellMovement = 0;
 		}
 
 		public void PreRender(Point leftFootPosition, Point maxRightPosition)
@@ -151,7 +181,15 @@ namespace ShoopDaPoop.Application
 			var minY = new Point(allMinY.Average(pos => pos.Position.X), firstY.Position.Y - firstY.Bounds.Height);
 			var maxX = new Point(lastX.Position.X + lastX.Bounds.Width, allMaxX.Average(pos => pos.Position.Y));
 			var maxY = new Point(allMaxY.Average(pos => pos.Position.X), lastY.Position.Y + lastY.Bounds.Height);
-			body.Render(new BodyPoints {MinX = minX, MinY = minY, MaxX = maxX, MaxY = maxY});
+			var leftTopCell = CellField[4, 4];
+			var rightBottomCell = CellField[5, 5];
+			var margin = 0.5f;
+			var leftTopSize = new Point(leftTopCell.Sprite.Texture.Width * margin, leftTopCell.Sprite.Texture.Height * margin);
+			var rightBottomSize = new Point(rightBottomCell.Sprite.Texture.Width * margin, rightBottomCell.Sprite.Texture.Height * margin);
+			var leftTop = leftTopCell.Sprite.Position.Subtract(leftTopSize);
+			var rightBottom = rightBottomCell.Sprite.Position.Add(rightBottomSize);
+			body.Render(new BodyPoints {MinX = minX, MinY = minY, MaxX = maxX, MaxY = maxY},
+				new BodyPoints {MinX = leftTop, MinY = leftTop, MaxX = rightBottom, MaxY = rightBottom});
 		}
 
 		public Container Container { get; private set; }

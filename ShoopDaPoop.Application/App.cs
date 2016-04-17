@@ -18,7 +18,7 @@ namespace ShoopDaPoop.Application
 			renderer = Pixi.AutoDetectRenderer(Window.InnerWidth, Window.InnerHeight, new RendererOptions
 			{
 				BackgroundColor = 0x1099bb,
-				RoundPixels = true
+				//RoundPixels = true
 			});
 			Document.Body.AppendChild(renderer.View);
 			stage = new Container();
@@ -100,14 +100,15 @@ namespace ShoopDaPoop.Application
 			board.Update();
 			if (board.UpdatesSinceCreation > 1 && !spawnedItems)
 			{
-				var items = Enumerable.Range(0, 8)
+				var items = Enumerable.Range(0, 16)
 					.Select(GetItem)
 					.ToList();
 				board.FillWithItems(items);
 				spawnedItems = true;
 			}
 			board.PreRender(new Point(200, 400), new Point(600, 400));
-			renderer.Render(stage);
+			if (board.UpdatesSinceCreation > 3)
+				renderer.Render(stage);
 		}
 
 		private static Item GetItem(int index)

@@ -5,6 +5,6 @@ namespace ShoopDaPoop.Application
 		Left,
 		Right,
 		Top,
-		Down
+		Bottom
 	}
 }

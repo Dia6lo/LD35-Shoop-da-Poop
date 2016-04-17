@@ -83,7 +83,7 @@ namespace ShoopDaPoop.Application
 
 		private Dictionary<Side, List<BodySide>> bodySides = new Dictionary<Side, List<BodySide>>
 		{
-			{Side.Down, new List<BodySide>
+			{Side.Bottom, new List<BodySide>
 			{
 				new BodySide {Belly = new IntPoint(4, 5), Border = new IntPoint(4, 9), InnerSide = Side.Left},
 				new BodySide {Belly = new IntPoint(5, 5), Border = new IntPoint(5, 9), InnerSide = Side.Right}
@@ -91,7 +91,7 @@ namespace ShoopDaPoop.Application
 			{Side.Left, new List<BodySide>
 			{
 				new BodySide {Belly = new IntPoint(4, 4), Border = new IntPoint(0, 4), InnerSide = Side.Top},
-				new BodySide {Belly = new IntPoint(4, 5), Border = new IntPoint(0, 5), InnerSide = Side.Down}
+				new BodySide {Belly = new IntPoint(4, 5), Border = new IntPoint(0, 5), InnerSide = Side.Bottom}
 			} },
 			{Side.Top, new List<BodySide>
 			{
@@ -101,7 +101,7 @@ namespace ShoopDaPoop.Application
 			{Side.Right, new List<BodySide>
 			{
 				new BodySide {Belly = new IntPoint(5, 4), Border = new IntPoint(9, 4), InnerSide = Side.Top},
-				new BodySide {Belly = new IntPoint(5, 5), Border = new IntPoint(9, 5), InnerSide = Side.Down}
+				new BodySide {Belly = new IntPoint(5, 5), Border = new IntPoint(9, 5), InnerSide = Side.Bottom}
 			} }
 		};
 
