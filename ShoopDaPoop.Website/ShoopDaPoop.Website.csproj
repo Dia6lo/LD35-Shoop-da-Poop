@@ -73,10 +73,19 @@
   <ItemGroup>
     <Content Include="assets\Circle.png" />
     <Content Include="assets\Diamond.png" />
-    <Content Include="assets\poop.png" />
+    <Content Include="assets\Dood.png" />
+    <Content Include="assets\LeftLimb.png" />
+    <Content Include="assets\Pain.png" />
+    <Content Include="assets\Pinus.png" />
+    <Content Include="assets\Poop_0.png" />
+    <Content Include="assets\Poop_1.png" />
+    <Content Include="assets\Poop_2.png" />
+    <Content Include="assets\Poop_3.png" />
+    <Content Include="assets\RightLimb.png" />
     <Content Include="assets\Snake.png" />
     <Content Include="assets\Square.png" />
     <Content Include="assets\tile.png" />
+    <Content Include="assets\Yeee.png" />
     <Content Include="index.html" />
     <Content Include="lib\pixi.min.js" />
     <Content Include="packages.config" />

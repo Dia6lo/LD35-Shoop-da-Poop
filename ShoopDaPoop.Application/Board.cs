@@ -11,6 +11,9 @@ namespace ShoopDaPoop.Application
 		private Body body;
 		private int updatesSinceCellMovement = RequiredUpdatesSinceMovement;
 		private const int RequiredUpdatesSinceMovement = 60;
+		public Action<Sprite> OnMatch;
+		public Action OnComplete;
+		private bool isLevelLoaded;
 
 		public Board(int width, int height)
 		{
@@ -47,15 +50,40 @@ namespace ShoopDaPoop.Application
 			Container.AddChild(body.Container);
 		}
 
+		public bool Interactive
+		{
+			set { body.Interactive = value; }
+		}
+
 		public CellField CellField { get; private set; }
 
-		public void FillWithItems(List<Item> items)
+		public void LoadTutorial()
 		{
-			var firstType = items.First().Type;
-			while (items.Take(4).All(item => item.Type == firstType))
+			var items = new List<Item>
 			{
-				items = Bridge.Linq.Enumerable.Shuffle(items).ToList();
-				firstType = items.First().Type;
+				new Circle(),
+				new Circle(),
+				new Square(),
+				new Square(),
+				new Square(),
+				new Square(),
+				new Circle(),
+				new Circle()
+			};
+			FillWithItems(items, false);
+		}
+
+		public void FillWithItems(List<Item> items, bool shuffle = true)
+		{
+			isLevelLoaded = true;
+			if (shuffle)
+			{
+				var firstType = items.First().Type;
+				while (items.Take(4).All(item => item.Type == firstType))
+				{
+					items = Bridge.Linq.Enumerable.Shuffle(items).ToList();
+					firstType = items.First().Type;
+				}
 			}
 			var cells = new List<Cell>();
 			CellField.ForEachCell((point, cell) => cells.Add(cell));
@@ -65,11 +93,11 @@ namespace ShoopDaPoop.Application
 			var currentIndex = 0;
 			foreach (var cellGroup in cellGroups)
 			{
-				foreach (var cell in cellGroup.Shuffle())
+				foreach (var cell in shuffle ? cellGroup.Shuffle() : cellGroup)
 				{
 					var item = items[currentIndex++];
 					item.Position = cell.Position;
-					item.State = ItemState.Idle;
+					item.State = ItemState.Spawned;
 					item.Sprite.Position = cell.Sprite.Position;
 					item.Board = this;
 					item.Target = cell;
@@ -86,6 +114,11 @@ namespace ShoopDaPoop.Application
 			}
 		}
 
+		public void Clear()
+		{
+			Items.Clear();
+		}
+
 		public void Update()
 		{
 			UpdatesSinceCreation++;
@@ -94,6 +127,11 @@ namespace ShoopDaPoop.Application
 			foreach (var item in Items)
 			{
 				item.Update();
+			}
+			if (!Items.Any() && isLevelLoaded)
+			{
+				isLevelLoaded = false;
+				OnComplete();
 			}
 		}
 
@@ -112,6 +150,7 @@ namespace ShoopDaPoop.Application
 			if(items.Any(item => item == null || item.State != ItemState.Idle)) return;
 			var firstType = items.First().Type;
 			if (items.Any(item => item.Type != firstType)) return;
+			OnMatch(CellField[5, 5].Sprite);
 			foreach (var item in items)
 			{
 				item.Die();

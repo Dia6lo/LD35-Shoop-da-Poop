@@ -45,11 +45,16 @@
     <Compile Include="CellField.cs" />
     <Compile Include="Circle.cs" />
     <Compile Include="Diamond.cs" />
+    <Compile Include="DragActions.cs" />
+    <Compile Include="FaceStatus.cs" />
     <Compile Include="IntPoint.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="ItemState.cs" />
     <Compile Include="ItemType.cs" />
+    <Compile Include="Limb.cs" />
     <Compile Include="PointExtensions.cs" />
+    <Compile Include="Poop.cs" />
+    <Compile Include="PoopState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShiftType.cs" />
     <Compile Include="Side.cs" />

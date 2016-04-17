@@ -13,7 +13,8 @@ namespace ShoopDaPoop.Application
 		{
 			Sprite = new Sprite(texture)
 			{
-				Anchor = new Point(0.5f, 0.5f)
+				Anchor = new Point(0.5f, 0.5f),
+				Scale = new Point()
 			};
 			MoveSpeed = 1;
 		}
@@ -77,9 +78,15 @@ namespace ShoopDaPoop.Application
 
 		private void HandleSpawnedState(BoardSummary summary)
 		{
-			if (summary.PrefferedTarget != null)
+			if (Sprite.Scale.X < 1f)
 			{
-				AssignTarget(summary.PrefferedTarget);
+				Sprite.Scale.X += 0.1f;
+				Sprite.Scale.Y += 0.1f;
+			}
+			else
+			{
+				Sprite.Scale = new Point(1, 1);
+				State = ItemState.Idle;
 			}
 		}
 
@@ -100,6 +107,7 @@ namespace ShoopDaPoop.Application
 
 		public void PreRender()
 		{
+			if (State == ItemState.Spawned) return;
 			if (Target != null)
 			{
 				var differenceToTarget = Target.Sprite.Position.Subtract(Sprite.Position);

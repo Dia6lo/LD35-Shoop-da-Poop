@@ -112,6 +112,13 @@ namespace ShoopDaPoop.Application
 			{
 				Shift(bodySide.Belly, bodySide.Border);
 			}
+			var pushedSides = bodySides
+				.SelectMany(s => s.Value)
+				.Where(s => s.InnerSide == side);
+			foreach (var pushedSide in pushedSides)
+			{
+				Shift(pushedSide.Border, pushedSide.Belly);
+			}
 		}
 
 		public void Push(Side side)

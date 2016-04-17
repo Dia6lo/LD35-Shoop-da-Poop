@@ -58,7 +58,6 @@ namespace ShoopDaPoop.Application
 
 			leftArm = new Sprite(leftLimbTexture)
 			{
-				Rotation = Pixi.DegToRad*45f,
 				Anchor = new Point(0.5f, 0.1f)
 			};
 			leftArm["interactive"] = true;
@@ -71,12 +70,11 @@ namespace ShoopDaPoop.Application
 					if (to.X - from.X >= pushOffset) return DragStatus.Push;
 					return DragStatus.None;
 				},
-				RotationMultiplier = (from, to) => from.Y < to.Y ? -1 : 1
+				RotationMultiplier = (from, to) => from.X < to.X ? -1 : 1
 			});
 
 			rightArm = new Sprite(rightLimbTexture)
 			{
-				Rotation = Pixi.DegToRad*-45f,
 				Anchor = new Point(0.5f, 0.1f)
 			};
 			rightArm["interactive"] = true;
@@ -89,7 +87,7 @@ namespace ShoopDaPoop.Application
 					if (from.X - to.X >= pushOffset) return DragStatus.Push;
 					return DragStatus.None;
 				},
-				RotationMultiplier = (from, to) => to.Y < from.Y ? -1 : 1
+				RotationMultiplier = (from, to) => from.X < to.X ? -1 : 1
 			});
 
 
@@ -156,6 +154,10 @@ namespace ShoopDaPoop.Application
 				Current = arg.Data.GetLocalPosition(Container),
 				StartTargetPosition = target.Position.Clone()
 			};
+			if (@params.Limb == Limb.Head)
+			{
+				dragData.StartTargetPosition.Y += target.Height*0.4f;
+			}
 			switch (dragData.Params.Limb)
 			{
 				case Limb.LeftArm:
@@ -238,6 +240,24 @@ namespace ShoopDaPoop.Application
 
 		public Point RightFoot { get; private set; }
 
+		public bool Interactive
+		{
+			set
+			{
+				var limbs = new[]
+				{
+					head,
+					leftLeg,
+					leftArm,
+					pinus
+				};
+				foreach (var limb in limbs)
+				{
+					limb["interactive"] = value;
+				}
+			}
+		}
+
 		private class DragDataParams
 		{
 			public Func<Point, Point, DragStatus> DragResult { get; set; }
@@ -276,7 +296,6 @@ namespace ShoopDaPoop.Application
 				if (Params.RotationMultiplier != null)
 					angle *= Params.RotationMultiplier(currentVector, targetVector);
 				Target.Rotation = angle;
-				Bridge.Html5.Console.WriteLine(targetVector.X + " " + targetVector.Y + " " + currentVector.X + " " + currentVector.Y + " " + cos + " " + angle*Pixi.RadToDeg);
 			}
 
 			public DragStatus GetDragStatus()
@@ -291,26 +310,5 @@ namespace ShoopDaPoop.Application
 			Pull,
 			Push
 		}
-	}
-
-	public enum FaceStatus
-	{
-		Normal,
-		Yeee,
-		Pain
-	}
-
-	public class DragActions
-	{
-		public Action Pull { get; set; }
-		public Action Push { get; set; }
-	}
-
-	public enum Limb
-	{
-		LeftArm,
-		RightArm,
-		Head,
-		Pinus
 	}
 }
