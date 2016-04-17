@@ -95,11 +95,15 @@ namespace ShoopDaPoop.Application
 							currentAnimationFrame = 0;
 						Sprite.Texture = animationTextures[currentAnimationFrame];
 					}
+					if (Sprite.Position.X < -100)
+					{
+						OnExit();
+					}
 					break;
 				default:
 					throw new ArgumentOutOfRangeException();
 			}
-			
+
 		}
 	}
 }

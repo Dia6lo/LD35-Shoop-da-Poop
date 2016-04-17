@@ -4,6 +4,8 @@ using System.Linq;
 using Bridge.Html5;
 using Bridge.Pixi;
 using Bridge.Pixi.Interaction;
+using Text = Bridge.Pixi.Text;
+using TextAlign = Bridge.Pixi.TextAlign;
 
 namespace ShoopDaPoop.Application
 {
@@ -14,6 +16,9 @@ namespace ShoopDaPoop.Application
 		private static Container stage;
 		private static int level = 0;
 		private static TextScreen textScreen;
+		private static Container poopContainer = new Container();
+		private static Sprite hint = Sprite.FromImage("assets/Hint.png");
+		private static Sprite restartButton = Sprite.FromImage("assets/Dood.png");
 
 		[Ready]
 		public static void Main()
@@ -24,18 +29,33 @@ namespace ShoopDaPoop.Application
 				//RoundPixels = true
 			});
 			Document.Body.AppendChild(renderer.View);
-			var audio = new AudioElement("assets/untitled.mp3");
-			Document.Body.AppendChild(audio);
-			audio.Loop = true;
-			audio.Play();
-
 			stage = new Container();
 			stage.AddChild(Sprite.FromImage("assets/Bathroom.png"));
 			SetupBoard();
+			stage.AddChild(hint);
+			hint.Visible = false;
+			hint.Position = new Point(320, 120);
+			stage.AddChild(restartButton);
+			restartButton["interactive"] = false;
+			restartButton.OnClick(OnRestartClick);
+			restartButton.Alpha = 0f;
+			restartButton.Position = new Point(510, 410);
 			textScreen = new TextScreen();
-			textScreen.FadeOut();
+			textScreen.LoadStartingScreen();
+			textScreen.OnFadeOut = () =>
+			{
+				board.LoadTutorial();
+				hint.Visible = true;
+				restartButton["interactive"] = true;
+			};
+			stage.AddChild(poopContainer);
 			stage.AddChild(textScreen.Container);
 			Animate();
+		}
+
+		private static void OnRestartClick(InteractionEvent arg)
+		{
+			board.Restart();
 		}
 
 		private static void SetupBoard()
@@ -112,16 +132,24 @@ namespace ShoopDaPoop.Application
 				new IntPoint(5, 5)
 			};
 			board.CellField.SetTemperature(1, belly);
-			board.LoadTutorial();
-			board.Interactive = false;
-			//LoadLevel(3);
 			stage.AddChild(board.Container);
 		}
 
 		private static void OnBoardComplete()
 		{
 			level++;
-			LoadLevel(level);
+			hint.Visible = false;
+			textScreen.FadeIn();
+			if (level == 5)
+			{
+				textScreen.LoadGameOver();
+			}
+			else
+			{
+				textScreen.LoadPreLevelScreen(level);
+			}
+			textScreen.OnFadeOut = () => LoadLevel(level);
+			restartButton["interactive"] = false;
 		}
 
 		private static void OnBoardMatch(Sprite arg)
@@ -133,11 +161,11 @@ namespace ShoopDaPoop.Application
 				Target = new Point(position.X, 400)
 			};
 			poops.Add(poop);
-			stage.AddChild(poop.Sprite);
+			poopContainer.AddChild(poop.Sprite);
 			poop.OnExit = () =>
 			{
 				poops.Remove(poop);
-				stage.RemoveChild(poop.Sprite);
+				poopContainer.RemoveChild(poop.Sprite);
 			};
 		}
 
@@ -147,6 +175,7 @@ namespace ShoopDaPoop.Application
 				.Select(GetItem)
 				.ToList();
 			board.FillWithItems(items);
+			restartButton["interactive"] = true;
 		}
 
 		private static List<Poop> poops = new List<Poop>();
@@ -155,39 +184,145 @@ namespace ShoopDaPoop.Application
 		{
 			Window.RequestAnimationFrame(Animate);
 			textScreen.Update();
-			if (textScreen.CurrentState == TextScreen.State.Visible) return;
-			board.Update();
-			board.PreRender(new Point(200, 400), new Point(600, 400));
-			if (board.UpdatesSinceCreation > 3)
-				renderer.Render(stage);
-			foreach (var poop in poops)
+			if (textScreen.CurrentState != TextScreen.State.Visible)
 			{
-				poop.Update();
+				board.Update();
+				board.PreRender(new Point(200, 400), new Point(600, 400));
+				foreach (var poop in poops)
+				{
+					poop.Update();
+				}
 			}
+			else
+			{
+				foreach (var poop in poops)
+				{
+					poop.OnExit();
+				}
+			}
+			renderer.Render(stage);
 		}
 
 		private static Item GetItem(int index)
 		{
-			if (index < 4) return new Square();
-			if (index < 8) return new Diamond();
-			if (index < 12) return new Circle();
-			return new Snake();
+			if (index < 4) return new CocaCola();
+			if (index < 8) return new Pizza();
+			if (index < 12) return new Snickers();
+			if (index < 16) return new Fish();
+			if (index < 20) return new PortalGun();
+			return new God();
 		}
 	}
 
 	public class TextScreen
 	{
 		private Graphics graphics;
+		private bool shiaOnScreen;
+		private int updatesSinceVisible;
+		private Text shiaHint;
+		private Container content = new Container();
+		public Action OnFadeOut;
 
 		public TextScreen(bool visible = true)
 		{
-			Container = new Container();
-			CurrentState = visible ? State.Visible : State.Invisible;
-			graphics = new Graphics
+			Container = new Container
 			{
 				Alpha = visible ? 1f : 0f
 			};
+			CurrentState = visible ? State.Visible : State.Invisible;
+			graphics = new Graphics();
 			Container.AddChild(graphics);
+			Container.AddChild(content);
+		}
+
+		public void LoadGameOver()
+		{
+			var firstLine = GetText("Good job, my friend!");
+			firstLine.Position = new Point(300, 25);
+			var secondLine = GetText("after THAT MUCH effort");
+			secondLine.Position = new Point(300, 75);
+			var thirdLine = GetText("You've got best body in");
+			thirdLine.Position = new Point(300, 125);
+			var preFourthLine = GetText("THE WORLD (time stops)");
+			preFourthLine.Position = new Point(300, 175);
+			var fourthLine = GetText("YOU JUST DID IT!");
+			fourthLine.Position = new Point(300, 225);
+			content.AddChild(firstLine);
+			content.AddChild(secondLine);
+			content.AddChild(thirdLine);
+			content.AddChild(preFourthLine);
+			content.AddChild(fourthLine);
+			LoadShia(false, "That's it");
+		}
+
+		public void LoadPreLevelScreen(int level)
+		{
+			var firstLine = GetText("Good job, my friend!");
+			firstLine.Position = new Point(300, 25);
+			var secondLine = GetText("but " + 1 + " year" + (level == 1 ? "" : "s") + " later");
+			secondLine.Position = new Point(300, 75);
+			var thirdLine = GetText("You've got even MORE FAT");
+			thirdLine.Position = new Point(300, 125);
+			var fourthLine = GetText("JUST DO IT! AGAIN! (YES, YOU CAN!)");
+			fourthLine.Position = new Point(300, 175);
+			content.AddChild(firstLine);
+			content.AddChild(secondLine);
+			content.AddChild(thirdLine);
+			content.AddChild(fourthLine);
+			LoadShia();
+		}
+
+		public void LoadStartingScreen()
+		{
+			var firstLine = GetText("You've worked hard last year");
+			firstLine.Position = new Point(300, 25);
+			var secondLine = GetText("to get FAT (shame on you)");
+			secondLine.Position = new Point(300, 75);
+			var thirdLine = GetText("It's time to get in SHAPE before summer");
+			thirdLine.Position = new Point(300, 125);
+			var fourthLine = GetText("JUST DO IT! (YES, YOU CAN!)");
+			fourthLine.Position = new Point(300, 175);
+			content.AddChild(firstLine);
+			content.AddChild(secondLine);
+			content.AddChild(thirdLine);
+			content.AddChild(fourthLine);
+			LoadShia();
+		}
+
+		private void LoadShia(bool interactive = true, string hint = "Click me ->")
+		{
+			var shia = Sprite.FromImage("assets/Shia.png");
+			shia.Anchor = new Point(0.5f, 0f);
+			shia.Position = new Point(300, 310);
+			shia["interactive"] = interactive;
+			shia.OnClick(e =>
+			{
+				shia["interactive"] = false;
+				FadeOut();
+				shiaOnScreen = false;
+				if (OnFadeOut != null)
+				{
+					OnFadeOut();
+				}
+			});
+			content.AddChild(shia);
+			shiaOnScreen = true;
+			shiaHint = GetText(hint);
+			shiaHint.Position = new Point(150, 450);
+			shiaHint.Visible = false;
+			content.AddChild(shiaHint);
+		}
+
+		private Text GetText(string text)
+		{
+			return new Text(text, new TextStyle
+			{
+				Fill = "white",
+				Align = TextAlign.Center
+			})
+			{
+				Anchor = new Point(0.5f, 0),
+			};
 		}
 
 		public Container Container { get; private set; }
@@ -209,25 +344,32 @@ namespace ShoopDaPoop.Application
 			switch (CurrentState)
 			{
 				case State.FadeIn:
-					graphics.Alpha += 0.01f;
-					if (graphics.Alpha >= 1f)
+					Container.Alpha += 0.01f;
+					if (Container.Alpha >= 1f)
 					{
 						CurrentState = State.Visible;
-						graphics.Alpha = 1f;
+						updatesSinceVisible = 0;
+						Container.Alpha = 1f;
 					}
 					break;
 				case State.FadeOut:
-					graphics.Alpha -= 0.01f;
-					if (graphics.Alpha <= 0f)
+					Container.Alpha -= 0.01f;
+					if (Container.Alpha <= 0f)
 					{
-						CurrentState = State.Visible;
-						graphics.Alpha = 0f;
+						CurrentState = State.Invisible;
+						Container.Alpha = 0f;
+						content.RemoveChildren();
+						shiaHint = null;
 					}
+					break;
+				case State.Visible:
+					updatesSinceVisible++;
+					if (updatesSinceVisible > 180 && shiaOnScreen)
+						shiaHint.Visible = true;
 					break;
 			}
 			graphics.Clear()
-				.LineStyle(0, 0x000000, graphics.Alpha)
-				.BeginFill(0x000000, graphics.Alpha)
+				.BeginFill(0x333333)
 				.DrawRect(0, 0, 600, 600)
 				.EndFill();
 

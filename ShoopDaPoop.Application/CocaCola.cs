@@ -2,9 +2,9 @@ using Bridge.Pixi;
 
 namespace ShoopDaPoop.Application
 {
-	public class Square : Item
+	public class CocaCola : Item
 	{
-		public Square(): base(Texture.FromImage("assets/Square.png"))
+		public CocaCola(): base(Texture.FromImage("assets/CocaCola.png"))
 		{
 
 		}

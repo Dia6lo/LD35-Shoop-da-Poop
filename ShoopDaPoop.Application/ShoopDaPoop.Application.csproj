@@ -43,8 +43,8 @@
     <Compile Include="BodyPoints.cs" />
     <Compile Include="Cell.cs" />
     <Compile Include="CellField.cs" />
-    <Compile Include="Circle.cs" />
-    <Compile Include="Diamond.cs" />
+    <Compile Include="God.cs" />
+    <Compile Include="Pizza.cs" />
     <Compile Include="DragActions.cs" />
     <Compile Include="FaceStatus.cs" />
     <Compile Include="IntPoint.cs" />
@@ -58,8 +58,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShiftType.cs" />
     <Compile Include="Side.cs" />
-    <Compile Include="Snake.cs" />
-    <Compile Include="Square.cs" />
+    <Compile Include="PortalGun.cs" />
+    <Compile Include="CocaCola.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Bridge, Version=1.12.0.0, Culture=neutral, processorArchitecture=MSIL">

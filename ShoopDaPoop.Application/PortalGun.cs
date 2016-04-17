@@ -2,9 +2,9 @@ using Bridge.Pixi;
 
 namespace ShoopDaPoop.Application
 {
-	public class Snake : Item
+	public class PortalGun : Item
 	{
-		public Snake(): base(Texture.FromImage("assets/Snake.png"))
+		public PortalGun(): base(Texture.FromImage("assets/PortalGun.png"))
 		{
 
 		}

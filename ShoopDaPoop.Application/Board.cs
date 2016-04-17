@@ -14,6 +14,8 @@ namespace ShoopDaPoop.Application
 		public Action<Sprite> OnMatch;
 		public Action OnComplete;
 		private bool isLevelLoaded;
+		private List<Item> savedItems;
+		private bool savedShuffle;
 
 		public Board(int width, int height)
 		{
@@ -61,20 +63,33 @@ namespace ShoopDaPoop.Application
 		{
 			var items = new List<Item>
 			{
-				new Circle(),
-				new Circle(),
-				new Square(),
-				new Square(),
-				new Square(),
-				new Square(),
-				new Circle(),
-				new Circle()
+				new Pizza(),
+				new Pizza(),
+				new CocaCola(),
+				new CocaCola(),
+				new CocaCola(),
+				new CocaCola(),
+				new Pizza(),
+				new Pizza()
 			};
 			FillWithItems(items, false);
 		}
 
+		public void Restart()
+		{
+			var itemsCopy = new List<Item>(Items);
+			foreach (var item in itemsCopy)
+			{
+				item.Die();
+			}
+			Items.Clear();
+			FillWithItems(savedItems, savedShuffle);
+		}
+
 		public void FillWithItems(List<Item> items, bool shuffle = true)
 		{
+			savedItems = items;
+			savedShuffle = shuffle;
 			isLevelLoaded = true;
 			if (shuffle)
 			{
