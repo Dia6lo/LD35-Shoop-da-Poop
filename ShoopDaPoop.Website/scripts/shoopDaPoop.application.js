@@ -40,7 +40,7 @@
                 ShoopDaPoop.Application.App.hint.position = new PIXI.Point(320, 120);
                 ShoopDaPoop.Application.App.stage.addChild(ShoopDaPoop.Application.App.restartButton);
                 ShoopDaPoop.Application.App.restartButton.interactive = false;
-                ShoopDaPoop.Application.App.restartButton.on('mouseclick', ShoopDaPoop.Application.App.onRestartClick).on('touchend', ShoopDaPoop.Application.App.onRestartClick);
+                ShoopDaPoop.Application.App.restartButton.on('click', ShoopDaPoop.Application.App.onRestartClick).on('touchend', ShoopDaPoop.Application.App.onRestartClick);
                 ShoopDaPoop.Application.App.restartButton.alpha = 0.0;
                 ShoopDaPoop.Application.App.restartButton.position = new PIXI.Point(510, 410);
                 ShoopDaPoop.Application.App.textScreen = new ShoopDaPoop.Application.TextScreen();

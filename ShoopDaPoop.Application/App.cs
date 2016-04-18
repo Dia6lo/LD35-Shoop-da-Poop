@@ -44,7 +44,7 @@ namespace ShoopDaPoop.Application
 			hint.Position = new Point(320, 120);
 			stage.AddChild(restartButton);
 			restartButton["interactive"] = false;
-			restartButton.OnMouseClick(OnRestartClick)
+			restartButton.OnClick(OnRestartClick)
 				.OnTouchEnd(OnRestartClick);
 			restartButton.Alpha = 0f;
 			restartButton.Position = new Point(510, 410);
