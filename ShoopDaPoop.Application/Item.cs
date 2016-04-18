@@ -128,6 +128,7 @@ namespace ShoopDaPoop.Application
 
 		public void Die()
 		{
+			if (State == ItemState.Died) return;
 			State = ItemState.Dying;
 			Target.TargetedBy = null;
 			Target = null;

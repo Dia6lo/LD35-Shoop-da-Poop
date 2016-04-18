@@ -1216,6 +1216,9 @@
             }
         },
         die: function () {
+            if (this.getState() === ShoopDaPoop.Application.ItemState.died) {
+                return;
+            }
             this.setState(ShoopDaPoop.Application.ItemState.dying);
             this.getTarget().setTargetedBy(null);
             this.setTarget(null);
