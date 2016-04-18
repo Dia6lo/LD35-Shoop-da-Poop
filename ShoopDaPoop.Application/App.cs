@@ -43,7 +43,8 @@ namespace ShoopDaPoop.Application
 			hint.Position = new Point(320, 120);
 			stage.AddChild(restartButton);
 			restartButton["interactive"] = false;
-			restartButton.OnClick(OnRestartClick);
+			restartButton.OnMouseClick(OnRestartClick)
+				.OnTouchEnd(OnRestartClick);
 			restartButton.Alpha = 0f;
 			restartButton.Position = new Point(510, 410);
 			textScreen = new TextScreen();
@@ -301,7 +302,19 @@ namespace ShoopDaPoop.Application
 			shia.Anchor = new Point(0.5f, 0f);
 			shia.Position = new Point(300, 310);
 			shia["interactive"] = interactive;
-			shia.OnClick(e =>
+			shia.OnceMouseDown(ShiaClicked(shia))
+				.OnceTouchStart(ShiaClicked(shia));
+			content.AddChild(shia);
+			shiaOnScreen = true;
+			shiaHint = GetText(hint);
+			shiaHint.Position = new Point(150, 450);
+			shiaHint.Visible = false;
+			content.AddChild(shiaHint);
+		}
+
+		private Action<InteractionEvent> ShiaClicked(Sprite shia)
+		{
+			return e =>
 			{
 				shia["interactive"] = false;
 				FadeOut();
@@ -310,13 +323,7 @@ namespace ShoopDaPoop.Application
 				{
 					OnFadeOut();
 				}
-			});
-			content.AddChild(shia);
-			shiaOnScreen = true;
-			shiaHint = GetText(hint);
-			shiaHint.Position = new Point(150, 450);
-			shiaHint.Visible = false;
-			content.AddChild(shiaHint);
+			};
 		}
 
 		private Text GetText(string text)
