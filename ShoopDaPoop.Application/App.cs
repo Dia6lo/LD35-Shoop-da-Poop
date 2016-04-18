@@ -29,6 +29,12 @@ namespace ShoopDaPoop.Application
 				//RoundPixels = true
 			});
 			Document.Body.AppendChild(renderer.View);
+			var audio = new AudioElement("assets/sandstorm.mp3")
+			{
+				Loop = true
+			};
+			Document.Body.AppendChild(audio);
+			audio.Play();
 			stage = new Container();
 			stage.AddChild(Sprite.FromImage("assets/Bathroom.png"));
 			SetupBoard();
