@@ -37,7 +37,7 @@
                 ShoopDaPoop.Application.App.hint.position = new PIXI.Point(320, 120);
                 ShoopDaPoop.Application.App.stage.addChild(ShoopDaPoop.Application.App.restartButton);
                 ShoopDaPoop.Application.App.restartButton.interactive = false;
-                ShoopDaPoop.Application.App.restartButton.on('click', ShoopDaPoop.Application.App.onRestartClick);
+                ShoopDaPoop.Application.App.restartButton.on('mouseclick', ShoopDaPoop.Application.App.onRestartClick).on('touchend', ShoopDaPoop.Application.App.onRestartClick);
                 ShoopDaPoop.Application.App.restartButton.alpha = 0.0;
                 ShoopDaPoop.Application.App.restartButton.position = new PIXI.Point(510, 410);
                 ShoopDaPoop.Application.App.textScreen = new ShoopDaPoop.Application.TextScreen();
@@ -1529,20 +1529,23 @@
             shia.anchor = new PIXI.Point(0.5, 0.0);
             shia.position = new PIXI.Point(300, 310);
             shia.interactive = interactive;
-            shia.on('click', Bridge.fn.bind(this, function (e) {
-                shia.interactive = false;
-                this.fadeOut();
-                this.shiaOnScreen = false;
-                if (Bridge.hasValue(this.onFadeOut)) {
-                    this.onFadeOut();
-                }
-            }));
+            shia.once('mousedown', this.shiaClicked(shia)).once('touchstart', this.shiaClicked(shia));
             this.content.addChild(shia);
             this.shiaOnScreen = true;
             this.shiaHint = this.getText(hint);
             this.shiaHint.position = new PIXI.Point(150, 450);
             this.shiaHint.visible = false;
             this.content.addChild(this.shiaHint);
+        },
+        shiaClicked: function (shia) {
+            return Bridge.fn.bind(this, function (e) {
+                shia.interactive = false;
+                this.fadeOut();
+                this.shiaOnScreen = false;
+                if (Bridge.hasValue(this.onFadeOut)) {
+                    this.onFadeOut();
+                }
+            });
         },
         getText: function (text) {
             return Bridge.merge(new PIXI.Text(text, { fill: "white", align: "center" }), {
