@@ -37,6 +37,7 @@ namespace ShoopDaPoop.Application
 			audio.Play();
 			stage = new Container();
 			stage.AddChild(Sprite.FromImage("assets/Bathroom.png"));
+			Window.AddEventListener(EventType.TouchStart, () => audio.Play());
 			SetupBoard();
 			stage.AddChild(hint);
 			hint.Visible = false;

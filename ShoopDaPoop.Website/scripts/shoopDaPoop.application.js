@@ -31,6 +31,9 @@
                 audio.play();
                 ShoopDaPoop.Application.App.stage = new PIXI.Container();
                 ShoopDaPoop.Application.App.stage.addChild(PIXI.Sprite.fromImage("assets/Bathroom.png"));
+                window.addEventListener("touchstart", function () {
+                    audio.play();
+                });
                 ShoopDaPoop.Application.App.setupBoard();
                 ShoopDaPoop.Application.App.stage.addChild(ShoopDaPoop.Application.App.hint);
                 ShoopDaPoop.Application.App.hint.visible = false;
