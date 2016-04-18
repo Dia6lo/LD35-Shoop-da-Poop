@@ -1501,7 +1501,7 @@
         loadPreLevelScreen: function (level) {
             var firstLine = this.getText("Good job, my friend!");
             firstLine.position = new PIXI.Point(300, 25);
-            var secondLine = this.getText("but " + 1 + " year" + (level === 1 ? "" : "s") + " later");
+            var secondLine = this.getText("but " + level + " year" + (level === 1 ? "" : "s") + " later");
             secondLine.position = new PIXI.Point(300, 75);
             var thirdLine = this.getText("You've got even MORE FAT");
             thirdLine.position = new PIXI.Point(300, 125);

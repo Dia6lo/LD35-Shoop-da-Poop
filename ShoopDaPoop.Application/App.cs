@@ -267,7 +267,7 @@ namespace ShoopDaPoop.Application
 		{
 			var firstLine = GetText("Good job, my friend!");
 			firstLine.Position = new Point(300, 25);
-			var secondLine = GetText("but " + 1 + " year" + (level == 1 ? "" : "s") + " later");
+			var secondLine = GetText("but " + level + " year" + (level == 1 ? "" : "s") + " later");
 			secondLine.Position = new Point(300, 75);
 			var thirdLine = GetText("You've got even MORE FAT");
 			thirdLine.Position = new Point(300, 125);
