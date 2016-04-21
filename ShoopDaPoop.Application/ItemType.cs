@@ -2,9 +2,11 @@ namespace ShoopDaPoop.Application
 {
 	public enum ItemType
 	{
-		Square,
-		Circle,
-		Diamond,
-		Snake
+		CocaCola,
+		God,
+		Pizza,
+		PortalGun,
+		Snickers,
+		Fish
 	}
 }

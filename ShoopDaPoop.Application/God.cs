@@ -11,7 +11,7 @@ namespace ShoopDaPoop.Application
 
 		public override ItemType Type
 		{
-			get { return ItemType.Circle; }
+			get { return ItemType.God; }
 		}
 	}
 
@@ -24,7 +24,7 @@ namespace ShoopDaPoop.Application
 
 		public override ItemType Type
 		{
-			get { return ItemType.Circle; }
+			get { return ItemType.Snickers; }
 		}
 	}
 
@@ -37,7 +37,7 @@ namespace ShoopDaPoop.Application
 
 		public override ItemType Type
 		{
-			get { return ItemType.Circle; }
+			get { return ItemType.Fish; }
 		}
 	}
 }

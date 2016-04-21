@@ -11,7 +11,7 @@ namespace ShoopDaPoop.Application
 
 		public override ItemType Type
 		{
-			get { return ItemType.Square; }
+			get { return ItemType.CocaCola; }
 		}
 	}
 }

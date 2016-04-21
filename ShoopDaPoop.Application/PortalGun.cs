@@ -11,7 +11,7 @@ namespace ShoopDaPoop.Application
 
 		public override ItemType Type
 		{
-			get { return ItemType.Snake; }
+			get { return ItemType.PortalGun; }
 		}
 	}
 }

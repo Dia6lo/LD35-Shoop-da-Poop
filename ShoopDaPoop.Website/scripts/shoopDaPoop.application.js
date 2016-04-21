@@ -1272,10 +1272,12 @@
     
     Bridge.define('ShoopDaPoop.Application.ItemType', {
         statics: {
-            square: 0,
-            circle: 1,
-            diamond: 2,
-            snake: 3
+            cocaCola: 0,
+            god: 1,
+            pizza: 2,
+            portalGun: 3,
+            snickers: 4,
+            fish: 5
         },
         $enum: true
     });
@@ -1616,7 +1618,7 @@
     
         },
         getType: function () {
-            return ShoopDaPoop.Application.ItemType.square;
+            return ShoopDaPoop.Application.ItemType.cocaCola;
         }
     });
     
@@ -1628,7 +1630,7 @@
     
         },
         getType: function () {
-            return ShoopDaPoop.Application.ItemType.circle;
+            return ShoopDaPoop.Application.ItemType.fish;
         }
     });
     
@@ -1640,7 +1642,7 @@
     
         },
         getType: function () {
-            return ShoopDaPoop.Application.ItemType.circle;
+            return ShoopDaPoop.Application.ItemType.god;
         }
     });
     
@@ -1652,7 +1654,7 @@
     
         },
         getType: function () {
-            return ShoopDaPoop.Application.ItemType.diamond;
+            return ShoopDaPoop.Application.ItemType.pizza;
         }
     });
     
@@ -1664,7 +1666,7 @@
     
         },
         getType: function () {
-            return ShoopDaPoop.Application.ItemType.snake;
+            return ShoopDaPoop.Application.ItemType.portalGun;
         }
     });
     
@@ -1676,7 +1678,7 @@
     
         },
         getType: function () {
-            return ShoopDaPoop.Application.ItemType.circle;
+            return ShoopDaPoop.Application.ItemType.snickers;
         }
     });
     
